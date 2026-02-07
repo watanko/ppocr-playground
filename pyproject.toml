@@ -1,0 +1,18 @@
+[project]
+name = "ppocr-playground"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "paddleocr>=3.4.0",
+    "paddlepaddle-gpu>=3.2.0,<3.3.0",
+]
+
+[[tool.uv.index]]
+url = "https://www.paddlepaddle.org.cn/packages/stable/cu126/"
+name = "paddle-gpu"
+explicit = true
+
+[tool.uv.sources]
+paddlepaddle-gpu = { index = "paddle-gpu" }
