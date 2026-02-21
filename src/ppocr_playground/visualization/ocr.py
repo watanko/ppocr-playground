@@ -1,20 +1,18 @@
-"""OCR推論結果のJSONを元に、検出領域を元画像上に可視化するスクリプト."""
+"""OCR 結果の可視化."""
 
-import json
-import sys
 from pathlib import Path
 
 import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-from main import OcrResult, OcrTextItem
+from ppocr_playground.models import OcrResult, OcrTextItem
+
+_FONT_PATH = "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
 
 # スコアに応じた色分けの閾値
 _HIGH_SCORE_THRESH = 0.9
 _MID_SCORE_THRESH = 0.7
-
-_FONT_PATH = "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
 
 # 横書き用BGR色
 _H_COLORS_BGR: dict[str, tuple[int, int, int]] = {
@@ -168,6 +166,7 @@ def visualize(
     image_path: str,
     result: OcrResult,
     output_path: str,
+    *,
     show_text: bool = True,
 ) -> None:
     """OCR結果を元画像上に可視化して保存する.
@@ -186,40 +185,3 @@ def visualize(
 
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     cv2.imwrite(output_path, image)
-
-
-def main() -> None:
-    """メインエントリポイント. JSONファイルと元画像から可視化画像を生成する."""
-    if len(sys.argv) < 2:
-        print(f"Usage: {sys.argv[0]} <json_path> [output_path] [--no-text]")
-        sys.exit(1)
-
-    json_path = sys.argv[1]
-    show_text = "--no-text" not in sys.argv
-
-    positional_args = [a for a in sys.argv[1:] if a != "--no-text"]
-    if len(positional_args) >= 2:
-        output_path = positional_args[1]
-    else:
-        stem = Path(json_path).stem.removesuffix("_ocr")
-        output_path = str(Path(json_path).parent / f"{stem}_vis.png")
-
-    with open(json_path, encoding="utf-8") as f:
-        data = json.load(f)
-    result = OcrResult.model_validate(data)
-
-    image_path = result.input_path
-    if not Path(image_path).is_absolute():
-        image_path = str(Path(json_path).parent / image_path)
-
-    print(f"入力JSON: {json_path}")
-    print(f"元画像: {image_path}")
-    print(f"テキスト表示: {'あり' if show_text else 'なし'}")
-
-    visualize(image_path, result, output_path, show_text=show_text)
-
-    print(f"出力: {output_path}")
-
-
-if __name__ == "__main__":
-    main()
