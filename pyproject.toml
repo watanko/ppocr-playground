@@ -5,22 +5,10 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "lxml>=6.0.2",
     "onnxruntime-gpu>=1.24.1",
-    "paddleocr>=3.4.0",
-    "paddlepaddle-gpu>=3.2.0,<3.3.0",
-    "paddlex[ocr]>=3.4.1",
     "pyclipper>=1.4.0",
     "shapely>=2.1.2",
 ]
-
-[[tool.uv.index]]
-url = "https://www.paddlepaddle.org.cn/packages/stable/cu126/"
-name = "paddle-gpu"
-explicit = true
-
-[tool.uv.sources]
-paddlepaddle-gpu = { index = "paddle-gpu" }
 
 [project.scripts]
 ppocr = "ppocr_playground.cli:main"

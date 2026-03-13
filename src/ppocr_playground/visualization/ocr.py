@@ -118,50 +118,6 @@ def draw_texts(image: np.ndarray, items: list[OcrTextItem]) -> np.ndarray:
     return cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
 
 
-def draw_legend(image: np.ndarray) -> np.ndarray:
-    """凡例を画像左上に描画する.
-
-    Args:
-        image: 描画対象の画像 (BGR, numpy配列).
-
-    Returns:
-        result: 凡例描画済みの画像.
-    """
-    pil_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-    draw = ImageDraw.Draw(pil_image)
-    font_size = max(16, pil_image.height // 150)
-    font = ImageFont.truetype(_FONT_PATH, font_size)
-
-    legends = [
-        ((0, 200, 0), f"横書き 高信頼 (>= {_HIGH_SCORE_THRESH})"),
-        ((255, 200, 0), f"横書き 中信頼 (>= {_MID_SCORE_THRESH})"),
-        ((255, 0, 0), f"横書き 低信頼 (< {_MID_SCORE_THRESH})"),
-        ((200, 0, 200), f"縦書き 高信頼 (>= {_HIGH_SCORE_THRESH})"),
-        ((200, 100, 200), f"縦書き 中信頼 (>= {_MID_SCORE_THRESH})"),
-        ((100, 0, 200), f"縦書き 低信頼 (< {_MID_SCORE_THRESH})"),
-    ]
-
-    x, y = 20, 20
-    padding = 8
-    line_height = font_size + padding
-
-    bg_h = line_height * len(legends) + padding * 2
-    bg_w = font_size * 22
-    draw.rectangle([x, y, x + bg_w, y + bg_h], fill=(255, 255, 255, 220))
-
-    for color, label in legends:
-        cy = y + padding
-        draw.rectangle(
-            [x + padding, cy, x + padding + font_size, cy + font_size], fill=color
-        )
-        draw.text(
-            (x + padding + font_size + padding, cy), label, fill=(0, 0, 0), font=font
-        )
-        y += line_height
-
-    return cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
-
-
 def visualize(
     image_path: str,
     result: OcrResult,
@@ -181,7 +137,5 @@ def visualize(
     image = draw_boxes(image, result.items)
     if show_text:
         image = draw_texts(image, result.items)
-    image = draw_legend(image)
-
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     cv2.imwrite(output_path, image)
